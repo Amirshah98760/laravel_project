@@ -45,11 +45,12 @@
     <div class="container">
         <h1>Welcome to Laravel!</h1>
 
-        <p>Laravel application is running successfully.</p>
+        <p>Laravel application is running successfully. </p>
 
         <p class="status">CI/CD Deployment Successful!</p>
 
         <p>Updated automatically using GitHub Actions and AWS EC2.</p>
+        <p>Last updated: {{ date('Y-m-d H:i:s') }}</p>
     </div>
 
 </body>
