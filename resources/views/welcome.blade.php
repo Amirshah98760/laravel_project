@@ -45,7 +45,7 @@
     <div class="container">
         <h1>Welcome to Laravel!</h1>
 
-        <p>Your Laravel application is running successfully.</p>
+        <p>Laravel application is running successfully.</p>
 
         <p class="status">CI/CD Deployment Successful!</p>
 
