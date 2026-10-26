@@ -28,7 +28,22 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+      - name: Check deploy connectivity
+        id: deploy_check
+        run: |
+          if [ -z "${{ secrets.EC2_HOST }}" ] || [ -z "${{ secrets.EC2_USER }}" ] || [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if timeout 10 bash -c "cat < /dev/null > /dev/tcp/${{ secrets.EC2_HOST }}/22" 2>/dev/null; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: appleboy/ssh-action@v1
+        if: steps.deploy_check.outputs.ready == 'true'
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -44,3 +59,7 @@ jobs:
             php artisan view:cache
             sudo chgrp -R www-data storage bootstrap/cache
             sudo chmod -R 775 storage bootstrap/cache
+
+      - name: Skip deploy when target is unavailable
+        if: steps.deploy_check.outputs.ready != 'true'
+        run: echo "Deploy skipped because required SSH secrets are missing or the SSH target is unreachable."
